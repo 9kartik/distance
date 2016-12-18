@@ -1,0 +1,38 @@
+.whole{
+  display: flex;
+  -webkit-flex-flow: row wrap;
+  justify-content: center;
+}
+  .whole>div{
+	flex:1;
+}  
+.whole>div:last-child{
+	border-left:1px dotted gray;
+}
+@media all and (max-width: 800px) {
+  .whole {
+    /* When on medium sized screens, we center it by evenly distributing empty space around items */
+    justify-content: space-around;
+  }
+   /* 
+   .whole>div{
+   	flex:1;
+   	}  */
+   	.whole>div{
+   		text-align: center
+   	}
+}
+
+/* Small screens */
+@media all and (max-width: 500px) {
+  .whole {
+    /* On small screens, we are no longer using row direction but column */
+    flex-direction: column;
+  }/* 
+   .whole>div{
+  	flex:1;
+  	}  */
+  	.whole>div{
+   		text-align: center
+   	}
+}
