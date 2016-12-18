@@ -6,14 +6,23 @@ map.append("circle")
 .attr("cy", y)
 .attr("r", r)
 .style("fill", clr);*/
-var selectors=d3.select("#selectors")
-addSels=()=> selectors.append('select').selectAll('option')
+for (var i in Object.keys(distMatrix))
+{
+	var par=Object.keys(distMatrix)[i]
+	for (var j in Object.keys(distMatrix[par]))
+	{
+		var dat=distMatrix[par][Object.keys(distMatrix[par])[j]]
+		distMatrix[par][Object.keys(distMatrix[par])[j]].push(dat[1]/dat[0])
+	}
+}
+addSels=(id)=> d3.select('#'+id).selectAll('option')
 .data(Object.keys(distMatrix))
 .enter()
 .append('option')
 .text((d)=>d)
-addSels()
-addSels()
+.attr('value',(d)=>d)
+addSels('list1')
+addSels('list2')
 
 
 map.selectAll('circle')
@@ -48,8 +57,30 @@ var lineFunction = d3.line()
                          .x(function(d) { return d.x; })
                          .y(function(d) { return d.y; })
                          .interpolate("linear");*/
+var paths=[]
+function f(p1,p2){
+		if(p1==p2)return ','+p2;
+		if(distMatrix[p1].hasOwnProperty(p2)) {drawPath(p1,p2); return p1+','+p2}
+		for(var i in Object.keys(distMatrix[p1])){
+		paths=[p1+'->'+Object.keys(distMatrix[p1])[i]+'-->']
+		return drawPath(p1,Object.keys(distMatrix[p1])[i])+'-->'+f(Object.keys(distMatrix[p1])[i],p2)
+		}
+	}
 
-var showPaths=function()
+function lestHops(){
+	var d=document.getElementById('list1')
+	var p1=d.options[d.selectedIndex].value
+	var d2=document.getElementById('list2')
+	var p2=d2.options[d2.selectedIndex].value
+	if(p1!=p2)
+	{
+		map.selectAll('line').remove()
+		map.selectAll('.dots').remove()
+		f(p1,p2)
+	}
+}
+
+function showPaths()
 {
 	for (var i in Object.keys(distMatrix))
 	{
@@ -64,4 +95,27 @@ var showPaths=function()
 			map.append('line').transition().duration(250).attr('x1',x1).attr('y1',y1).attr('x2',x2).attr('y2',y2).attr('stroke','black')
 		}
 	}
+}
+var lineData = [ { "x": 0,   "y": 0},  { "x": 0,  "y": 5},
+                 { "x": 5,  "y": 0}, { "x": 0,  "y": 0}];
+var lineFunction = d3.line()
+                    .x((d)=>d.x)
+                    .y((d)=>d.y)
+function drawPath(p1,p2)
+{
+		var x1=d3.select('#'+p1).attr('x')
+		var y1=d3.select('#'+p1).attr('y')
+		var x2=d3.select('#'+p2).attr('x')
+		var y2=d3.select('#'+p2).attr('y')
+		map.append('line').transition().duration(250).attr('x1',x1).attr('y1',y1).attr('x2',x2).attr('y2',y2).attr('stroke','black')
+		   map.append("circle")
+		   //.attr('transform','translate('+x2+','+y2+') '+'rotate('+-90*Math.atan2(y2-y1,x2-x1)/Math.PI+')')
+           //.attr("d", lineFunction(lineData))
+           .attr('class','dots')
+           .attr('cx',x2)
+           .attr('cy',y2)
+           .attr('r',2)
+           .attr("stroke", "transparent")
+           .attr("fill", "rgba(255,0,0,0.8)")
+
 }
